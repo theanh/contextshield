@@ -1,0 +1,710 @@
+entries:
+  # Credit Card PAN — deterministic with Luhn + IIN prefix + per-network length
+  # confidence: 1.0 (multi-constraint deterministic)
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4111 1111 1111 1111"
+    expect_finding: true
+    description: "valid Visa PAN"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "5500 0000 0000 0004"
+    expect_finding: true
+    description: "valid Mastercard PAN (51-55 range)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "3400 0000 0000 009"
+    expect_finding: true
+    description: "valid Amex 15-digit PAN"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6011 0000 0000 0004"
+    expect_finding: true
+    description: "valid Discover PAN"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "card number 4111 1111 1111 1111 expires 12/28"
+    expect_finding: true
+    description: "PAN in prose context"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4111 1111 1111 1112"
+    expect_finding: false
+    description: "invalid Luhn — last digit changed"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "1730000000001"
+    expect_finding: false
+    description: "13-digit ms-epoch timestamp — passes Luhn but fails IIN (D-18)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "1234567890123456"
+    expect_finding: false
+    description: "random 16-digit — fails Luhn"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "0000 0000 0000 0000"
+    expect_finding: false
+    description: "all zeros — passes Luhn but fails IIN"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "1234 5678 9012 3456"
+    expect_finding: false
+    description: "sequential digits — fails Luhn"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "3711 1111 1111 115"
+    expect_finding: false
+    description: "Amex-prefix 15-digit with broken Luhn"
+
+  # IBAN — deterministic: mod-97 + country code + country length
+  # confidence: 1.0 (multi-constraint mathematical guarantee)
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "GB82 WEST 1234 5698 7654 32"
+    expect_finding: true
+    description: "valid UK IBAN"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "DE89 3704 0044 0532 0130 00"
+    expect_finding: true
+    description: "valid German IBAN"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "FR14 2004 1010 0505 0001 3M02 606"
+    expect_finding: true
+    description: "valid French IBAN"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "IBAN: GB82 WEST 1234 5698 7654 32"
+    expect_finding: true
+    description: "IBAN in prose context"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "GB82 TEST 1234 5698 7654 32"
+    expect_finding: false
+    description: "invalid — TEST country code (no valid country)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "GB00 WEST 1234 5698 7654 32"
+    expect_finding: false
+    description: "invalid IBAN — GB00 fails mod-97"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "XX11 2222 3333 4444 5555 66"
+    expect_finding: false
+    description: "invalid — unknown country code XX"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "GB82 WEST 1234 5698 7654 321"
+    expect_finding: false
+    description: "too long — 23 chars vs expected 22 for GB"
+
+  # ----------------------------------------------------------------------
+  # Deepened corpus (2026-07-15): boundary-value + adversarial near-miss
+  # cases for credible per-class precision/recall. Positives are provably
+  # valid instances; negatives are provably NOT the class by ground truth.
+  # Some entries deliberately expose measured limits (documented in the
+  # README Detection accuracy section) rather than hide them.
+  # ----------------------------------------------------------------------
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4131932353702580"
+    expect_finding: true
+    description: "valid Visa 16-digit (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4239 9134 6564 7"
+    expect_finding: true
+    description: "valid Visa 13-digit legacy (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4380-2410-9262-4670-319"
+    expect_finding: true
+    description: "valid Visa 19-digit (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "5195619725592480"
+    expect_finding: true
+    description: "valid Mastercard 51 lower boundary (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "5509 8481 5528 5858"
+    expect_finding: true
+    description: "valid Mastercard 55 upper boundary (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "2221-9777-7172-0883"
+    expect_finding: true
+    description: "valid Mastercard 2-series lower boundary 2221 (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "2720513200910468"
+    expect_finding: true
+    description: "valid Mastercard 2-series upper boundary 2720 (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "3446 2149 6795 160"
+    expect_finding: true
+    description: "valid Amex 34-prefix (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "3719-6294-7433-951"
+    expect_finding: true
+    description: "valid Amex 37-prefix (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6011478893054819"
+    expect_finding: true
+    description: "valid Discover 6011-prefix (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6514 4080 4657 8895"
+    expect_finding: true
+    description: "valid Discover 65-prefix (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6443-3757-7727-3440"
+    expect_finding: true
+    description: "valid Discover 644 lower boundary (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6499395534359772"
+    expect_finding: true
+    description: "valid Discover 649 upper boundary (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6011 5208 5913 0813 679"
+    expect_finding: true
+    description: "valid Discover 19-digit (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4811561413003437"
+    expect_finding: true
+    description: "valid Visa 16-digit instance (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4645 0928 5009 6"
+    expect_finding: true
+    description: "valid Visa 13-digit legacy instance (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4752-0066-3466-1678-765"
+    expect_finding: true
+    description: "valid Visa 19-digit instance (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "5137093016179079"
+    expect_finding: true
+    description: "valid Mastercard 51 lower boundary instance (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "5596 2056 0300 1375"
+    expect_finding: true
+    description: "valid Mastercard 55 upper boundary instance (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "2221-4335-4999-1307"
+    expect_finding: true
+    description: "valid Mastercard 2-series lower boundary 2221 instance (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "2720102793110056"
+    expect_finding: true
+    description: "valid Mastercard 2-series upper boundary 2720 instance (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "3478 1337 7090 871"
+    expect_finding: true
+    description: "valid Amex 34-prefix instance (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "3776-9097-5183-479"
+    expect_finding: true
+    description: "valid Amex 37-prefix instance (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6011229530800704"
+    expect_finding: true
+    description: "valid Discover 6011-prefix instance (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6557 6682 6960 3385"
+    expect_finding: true
+    description: "valid Discover 65-prefix instance (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6445-8643-2041-2538"
+    expect_finding: true
+    description: "valid Discover 644 lower boundary instance (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6495739311372488"
+    expect_finding: true
+    description: "valid Discover 649 upper boundary instance (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "6011 8314 9782 6443 909"
+    expect_finding: true
+    description: "valid Discover 19-digit instance (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4640-1018-5637-5542"
+    expect_finding: true
+    description: "valid Visa 16-digit instance (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4214852553422"
+    expect_finding: true
+    description: "valid Visa 13-digit legacy instance (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4803 0783 1358 4913 286"
+    expect_finding: true
+    description: "valid Visa 19-digit instance (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "5173-6644-1159-1061"
+    expect_finding: true
+    description: "valid Mastercard 51 lower boundary instance (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "5511485300054347"
+    expect_finding: true
+    description: "valid Mastercard 55 upper boundary instance (plain)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "2221 5240 0426 8981"
+    expect_finding: true
+    description: "valid Mastercard 2-series lower boundary 2221 instance (spaced)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "2720-3109-8847-7160"
+    expect_finding: true
+    description: "valid Mastercard 2-series upper boundary 2720 instance (dashed)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "Please charge 4578 5917 2487 8642 today."
+    expect_finding: true
+    description: "Visa PAN in prose"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "card: 5570 9692 1299 5323"
+    expect_finding: true
+    description: "Mastercard PAN after label"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "AMEX 379225480169529"
+    expect_finding: true
+    description: "Amex PAN after label"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "1731024000001"
+    expect_finding: false
+    description: "13-digit ms-epoch timestamp, Luhn-valid (verified) but non-issuer IIN prefix 173"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "1609459200009"
+    expect_finding: false
+    description: "13-digit ms-epoch timestamp, Luhn-valid (verified) but non-issuer IIN prefix 160"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "1774 7215 2057 0873"
+    expect_finding: false
+    description: "Luhn-valid 16-digit, non-issuer IIN prefix 1"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "7519 3762 6589 4793"
+    expect_finding: false
+    description: "Luhn-valid 16-digit, non-issuer IIN prefix 7"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "8874 9793 2012 2212"
+    expect_finding: false
+    description: "Luhn-valid 16-digit, non-issuer IIN prefix 8"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "9234 1662 1239 8935"
+    expect_finding: false
+    description: "Luhn-valid 16-digit, non-issuer IIN prefix 9"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "0168 3550 3635 1324"
+    expect_finding: false
+    description: "Luhn-valid 16-digit, non-issuer IIN prefix 0"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "45965154174586"
+    expect_finding: false
+    description: "Visa-prefix but invalid length 14"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "421414594317137"
+    expect_finding: false
+    description: "Visa-prefix but invalid length 15"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "49982454877143667"
+    expect_finding: false
+    description: "Visa-prefix but invalid length 17"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "482468432164179129"
+    expect_finding: false
+    description: "Visa-prefix but invalid length 18"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "3779906611391708"
+    expect_finding: false
+    description: "Amex-prefix but 16 digits (valid len is 15)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4999 9455 4083 8732"
+    expect_finding: false
+    description: "Visa-prefix 16-digit failing Luhn"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4089 6124 1791 4816"
+    expect_finding: false
+    description: "Visa-prefix 16-digit failing Luhn"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4038 7449 9007 6186"
+    expect_finding: false
+    description: "Visa-prefix 16-digit failing Luhn"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4177 6462 7331 3526"
+    expect_finding: false
+    description: "Visa-prefix 16-digit failing Luhn"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4605 0987 5703 2202"
+    expect_finding: false
+    description: "Visa-prefix 16-digit failing Luhn"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "4098 8031 2816 9673"
+    expect_finding: false
+    description: "Visa-prefix 16-digit failing Luhn"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "call +1 415 555 0132 for support"
+    expect_finding: false
+    description: "US phone number, not a PAN"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "order #100000000001234"
+    expect_finding: false
+    description: "order id digit run, fails Luhn/IIN"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "0000 0000 0000 0000"
+    expect_finding: false
+    description: "all zeros (Luhn passes, IIN fails)"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "tracking 1Z999AA10123456784"
+    expect_finding: false
+    description: "shipping tracking id, not numeric PAN"
+
+  - rule_id: credit-card-pan
+    class: regulated.credit_card
+    input: "invoice total 1234567.89 USD"
+    expect_finding: false
+    description: "decimal money amount, not a PAN"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "NO7832UB0K4X77K"
+    expect_finding: true
+    description: "valid NO IBAN (plain)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "BE76 VNGR 1262 BXTP"
+    expect_finding: true
+    description: "valid BE IBAN (spaced)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "NL781THRBQQUJDPE74"
+    expect_finding: true
+    description: "valid NL IBAN (plain)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "DK24 OSLY JUS3 F0LV C6"
+    expect_finding: true
+    description: "valid DK IBAN (spaced)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "DE17N5E6R4BILYV6T00KHX"
+    expect_finding: true
+    description: "valid DE IBAN (plain)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "GB98 QWWX D1BU D8IW H071 LN"
+    expect_finding: true
+    description: "valid GB IBAN (spaced)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "CH051AGIKRIE2JQR6IN4A"
+    expect_finding: true
+    description: "valid CH IBAN (plain)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "AT59 N6OG A7W3 9345 O4U8"
+    expect_finding: true
+    description: "valid AT IBAN (spaced)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "FR286K8PRQN1RGHINSYN4OLHIN1"
+    expect_finding: true
+    description: "valid FR IBAN (plain)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "IT23 SSIK JLUL X6TJ E244 VRUK VPX"
+    expect_finding: true
+    description: "valid IT IBAN (spaced)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "ES71ZPTPDWYONVHHD4YMQ9CH"
+    expect_finding: true
+    description: "valid ES IBAN (plain)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "SE50 MVFO Q2BP H4RU 2XPN ESHH"
+    expect_finding: true
+    description: "valid SE IBAN (spaced)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "PT53QTCFHKUMG06EVCFW5RXZU"
+    expect_finding: true
+    description: "valid PT IBAN (plain)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "MT14 WFXN 9RUG YHX5 6XYX ZGRX 92NI LAP"
+    expect_finding: true
+    description: "valid MT IBAN (spaced)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "LC25P9NGQJPUCV92QXQ4HJPFT886Q6UI"
+    expect_finding: true
+    description: "valid LC IBAN (plain)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "IE69 H3Y1 GK5K ER38 RSSO P8"
+    expect_finding: true
+    description: "valid IE IBAN (spaced)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "IBAN DE63 2XZF MV12 KDE8 LU0A BF"
+    expect_finding: true
+    description: "German IBAN after label"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "transfer to FR91 3OZ9 997V 9NRB 049M GMEC EG7 please"
+    expect_finding: true
+    description: "French IBAN in prose"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "GB83 KQXO LPUA SIR8 1CAL PG"
+    expect_finding: false
+    description: "GB IBAN correct length, corrupted body (mod-97 fails)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "DE27 8AXO T4LV 52YQ MB8V D5"
+    expect_finding: false
+    description: "DE IBAN correct length, corrupted body (mod-97 fails)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "FR78 XXXI COYH ZRPO CPVG E5XJ U9C"
+    expect_finding: false
+    description: "FR IBAN correct length, corrupted body (mod-97 fails)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "NL77 QIXL 02C7 V0SE J7"
+    expect_finding: false
+    description: "NL IBAN correct length, corrupted body (mod-97 fails)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "ES97 KHXN 6DB6 34R4 DVH9 Z5QE"
+    expect_finding: false
+    description: "ES IBAN correct length, corrupted body (mod-97 fails)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "IT97 VCXA XS2X O399 D2ME GBC9 J2V"
+    expect_finding: false
+    description: "IT IBAN correct length, corrupted body (mod-97 fails)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "SE20 MDXF 3CW7 NYYQ 3ZHN KSD6"
+    expect_finding: false
+    description: "SE IBAN correct length, corrupted body (mod-97 fails)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "CH46 G3XV FSB0 9D5F WV6P Y"
+    expect_finding: false
+    description: "CH IBAN correct length, corrupted body (mod-97 fails)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "GB94 2PHN BFTQ 9Z6Z JJ9T H20"
+    expect_finding: false
+    description: "GB IBAN wrong length (23 vs 22)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "DE84 UNI6 CXTO PW3Z 7MHH A"
+    expect_finding: false
+    description: "DE IBAN wrong length (21 vs 22)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "FR37 07ID OMVU 70AG XTNY 9O21 LJU0"
+    expect_finding: false
+    description: "FR IBAN wrong length (28 vs 27)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "NL67 5KF0 UK7E EWRJ UQ00"
+    expect_finding: false
+    description: "NL IBAN wrong length (20 vs 18)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "ES17 WLRZ 7ACX J62F LXN1 5DJ"
+    expect_finding: false
+    description: "ES IBAN wrong length (23 vs 24)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "IT52 SAYG QH7O 06MW VHKL BJJY 1L60"
+    expect_finding: false
+    description: "IT IBAN wrong length (28 vs 27)"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "XX82 GRXP GLO8 CGFG 0XKL QX"
+    expect_finding: false
+    description: "unknown country code XX"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "ZZ82 AUVR NJMS VAKU 4AHI T4"
+    expect_finding: false
+    description: "unknown country code ZZ"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "QZ82 39AL VSMW XSIU V032 Z3"
+    expect_finding: false
+    description: "unknown country code QZ"
+
+  - rule_id: iban
+    class: regulated.iban
+    input: "AA82 WA0C BSOE PCF4 JLQH Y0"
+    expect_finding: false
+    description: "unknown country code AA"
+

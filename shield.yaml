@@ -1,0 +1,21 @@
+# ContextShield v0.1 configuration
+# See ARCHITECTURE.md for the system architecture.
+listen: ":8080"
+upstreams:
+  openai: https://api.openai.com
+  # anthropic: https://api.anthropic.com
+
+defaults:
+  action: log_only
+  on_error: closed
+
+rules:
+  - classes: ["secret.*"]
+    action: block
+  # Regulated and structural classes inherit defaults.action=log_only
+  # until a deployment chooses mask thresholds from eval data.
+
+exemptions: []
+
+logger:
+  output: stdout

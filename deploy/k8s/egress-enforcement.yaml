@@ -1,0 +1,25 @@
+# ContextShield egress enforcement — completeness is a network property.
+# Apps that set OPENAI_BASE_URL / ANTHROPIC_BASE_URL point at contextshield
+# get a network-level guarantee that no other LLM egress path exists.
+#
+# Apply: kubectl apply -f deploy/k8s/egress-enforcement.yaml
+# Label: add llm-egress: restricted to any namespace or pod that must route
+#        LLM traffic exclusively through ContextShield.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: llm-egress-via-contextshield-only
+spec:
+  podSelector:
+    matchLabels:
+      llm-egress: restricted
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: contextshield
+    - ports:
+        - port: 53
+          protocol: UDP

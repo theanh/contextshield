@@ -1,0 +1,11 @@
+id: iban
+class: regulated.iban
+severity: high
+pattern: '\b[A-Z]{2}\d{2}(?: ?[A-Z0-9]){10,32}\b'
+max_match_len: 42
+prefilter: iban
+validators: ["iban_country_length", "iban_mod97"]
+examples:
+  positive: ["GB82 WEST 1234 5698 7654 32"]
+  negative: ["GB82 TEST 1234 5698 7654 32", "GB00 WEST 1234 5698 7654 32"]
+

@@ -1,0 +1,22 @@
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+dist/
+build/
+
+# Go
+/contextshield
+/tmp/
+*.test
+*.out
+vendor/
+
+# Local session handoffs; never publish these.
+/HANDOFF*.md
+
+# Project planning and research notes; keep local-only.
+/docs/

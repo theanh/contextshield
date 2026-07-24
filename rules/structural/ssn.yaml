@@ -1,0 +1,16 @@
+id: us-ssn-structural
+class: structural.ssn
+severity: medium
+pattern: '\b\d{3}-?\d{2}-?\d{4}\b'
+max_match_len: 11
+prefilter: digit
+validators: ["ssn_range"]
+# Structural class: no checksum, never deterministic-by-construction, so capped
+# below block grade per Invariant 7 / D-18 (Presidio caps bare US_SSN at 0.85).
+# Measured eval precision informs the policy min_confidence gate, not this
+# intrinsic confidence — a clean 5-sample corpus does not make SSN deterministic.
+confidence: 0.85
+examples:
+  positive: ["123-45-6789"]
+  negative: ["000-45-6789", "666-45-6789", "987-65-4321", "123-00-6789", "123-45-0000"]
+

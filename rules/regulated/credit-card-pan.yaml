@@ -1,0 +1,19 @@
+id: credit-card-pan
+class: regulated.credit_card
+severity: high
+# 13-19 total PAN digits: one mandatory leading digit + 12-18 reps of
+# (optional separator + mandatory digit) = 13-19 digits overall. The
+# separator sits BEFORE each digit (not after) so every match ends on a
+# digit and can never swallow a trailing separator into the match.
+pattern: '\b\d(?:[ -]?\d){12,18}\b'
+# True worst case: 19 digits + 18 separators = 37 chars (1 + 18*2). The
+# engine adds its own +1 right-context byte on top (candidate-window
+# boundary fix) — max_match_len declares this rule's own intrinsic bound
+# only, not that extra byte.
+max_match_len: 37
+prefilter: digit
+validators: ["luhn", "iin_prefix", "length_per_network"]
+examples:
+  positive: ["4111 1111 1111 1111"]
+  negative: ["4111 1111 1111 1112", "1730000000001"]
+

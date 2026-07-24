@@ -1,0 +1,419 @@
+entries:
+  # US SSN — deterministic with SSA range validation (but pattern alone is heuristic)
+  # confidence: measured from eval FP rate (placeholder 0.85)
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123-45-6789"
+    expect_finding: true
+    description: "standard valid SSN"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "899-65-4320"
+    expect_finding: true
+    description: "SSN in upper valid SSA range (area 899, group 65, serial 4320)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "001-01-0001"
+    expect_finding: true
+    description: "SSN at bottom of valid range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN 123-45-6789"
+    expect_finding: true
+    description: "SSN in prose context"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123456789"
+    expect_finding: true
+    description: "SSN without dashes"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "000-45-6789"
+    expect_finding: false
+    description: "area 000 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "666-45-6789"
+    expect_finding: false
+    description: "area 666 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "987-65-4321"
+    expect_finding: false
+    description: "serial 4321 excluded by SSA range (advertised)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123-00-6789"
+    expect_finding: false
+    description: "group 00 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123-45-0000"
+    expect_finding: false
+    description: "serial 0000 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "900-45-6789"
+    expect_finding: false
+    description: "area >= 900 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "078-05-1120"
+    expect_finding: false
+    description: "advertised SSN 078-05-1120 excluded"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "219-09-9999"
+    expect_finding: false
+    description: "advertised SSN 219-09-9999 excluded"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123-45-678"
+    expect_finding: false
+    description: "too short — only 10 chars with dashes"
+
+  # ----------------------------------------------------------------------
+  # Deepened corpus (2026-07-15): boundary-value + adversarial near-miss
+  # cases for credible per-class precision/recall. Positives are provably
+  # valid instances; negatives are provably NOT the class by ground truth.
+  # Some entries deliberately expose measured limits (documented in the
+  # README Detection accuracy section) rather than hide them.
+  # ----------------------------------------------------------------------
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "001-01-0001"
+    expect_finding: true
+    description: "valid SSN area lower boundary 001 (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "899654320"
+    expect_finding: true
+    description: "valid SSN area upper boundary 899 (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN: 665-12-3456"
+    expect_finding: true
+    description: "valid SSN area just below 666 (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "667-12-3456"
+    expect_finding: true
+    description: "valid SSN area just above 666 (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "001010001"
+    expect_finding: true
+    description: "valid SSN group/serial lower boundary (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN: 123-45-9999"
+    expect_finding: true
+    description: "valid SSN serial upper boundary 9999 (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "772-10-5544"
+    expect_finding: true
+    description: "valid SSN mid-range area (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "078521121"
+    expect_finding: true
+    description: "valid SSN 078 area non-advertised serial (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN: 219-09-9998"
+    expect_finding: true
+    description: "valid SSN 219 area non-advertised serial (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "500-50-5000"
+    expect_finding: true
+    description: "valid SSN mid-range (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "899999999"
+    expect_finding: true
+    description: "valid SSN all upper boundaries (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN: 001-99-0001"
+    expect_finding: true
+    description: "valid SSN group upper boundary 99 (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "007-01-0001"
+    expect_finding: true
+    description: "valid in-range SSN instance (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "013080138"
+    expect_finding: true
+    description: "valid in-range SSN instance (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN 044-15-0275"
+    expect_finding: true
+    description: "valid in-range SSN instance (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123-22-0412"
+    expect_finding: true
+    description: "valid in-range SSN instance (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "200290549"
+    expect_finding: true
+    description: "valid in-range SSN instance (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN 433-36-0686"
+    expect_finding: true
+    description: "valid in-range SSN instance (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "586-43-0823"
+    expect_finding: true
+    description: "valid in-range SSN instance (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "665500960"
+    expect_finding: true
+    description: "valid in-range SSN instance (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN 667-57-1097"
+    expect_finding: true
+    description: "valid in-range SSN instance (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "700-64-1234"
+    expect_finding: true
+    description: "valid in-range SSN instance (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "772711371"
+    expect_finding: true
+    description: "valid in-range SSN instance (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN 899-78-1508"
+    expect_finding: true
+    description: "valid in-range SSN instance (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "007-85-1645"
+    expect_finding: true
+    description: "valid in-range SSN instance (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "013921782"
+    expect_finding: true
+    description: "valid in-range SSN instance (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN 044-99-1919"
+    expect_finding: true
+    description: "valid in-range SSN instance (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123-07-2056"
+    expect_finding: true
+    description: "valid in-range SSN instance (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "200142193"
+    expect_finding: true
+    description: "valid in-range SSN instance (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "SSN 433-21-2330"
+    expect_finding: true
+    description: "valid in-range SSN instance (prose)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "586-28-2467"
+    expect_finding: true
+    description: "valid in-range SSN instance (dashed)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "665352604"
+    expect_finding: true
+    description: "valid in-range SSN instance (no dashes)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "000-12-3456"
+    expect_finding: false
+    description: "area 000 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "666-12-3456"
+    expect_finding: false
+    description: "area 666 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "900-12-3456"
+    expect_finding: false
+    description: "area 900 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "912-12-3456"
+    expect_finding: false
+    description: "area 912 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "999-12-3456"
+    expect_finding: false
+    description: "area 999 excluded by SSA range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123-00-3456"
+    expect_finding: false
+    description: "group 00 excluded"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123-45-0000"
+    expect_finding: false
+    description: "serial 0000 excluded"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "078-05-1120"
+    expect_finding: false
+    description: "advertised SSN 078-05-1120 excluded"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "219-09-9999"
+    expect_finding: false
+    description: "advertised SSN 219-09-9999 excluded"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "123-45-678"
+    expect_finding: false
+    description: "too short (8 digits)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "1234567890"
+    expect_finding: false
+    description: "10 contiguous digits, no isolated 9-digit match"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "12-345-6789"
+    expect_finding: false
+    description: "wrong grouping (2-3-4)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "ABC-45-6789"
+    expect_finding: false
+    description: "letters in area position"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "call 415-555-0132 now"
+    expect_finding: false
+    description: "US phone 3-3-4, not SSN format"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "+1 (212) 555-0198"
+    expect_finding: false
+    description: "formatted phone number"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "invoice 2026, net 30 terms"
+    expect_finding: false
+    description: "prose with short digit groups"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "12345-6789"
+    expect_finding: false
+    description: "NY ZIP+4, area 123 in SSA range (confusable)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "60601-2345"
+    expect_finding: false
+    description: "Chicago ZIP+4, area 606 in SSA range (confusable)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "90210-1234"
+    expect_finding: false
+    description: "Beverly Hills ZIP+4, area 902 out of range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "99801-5500"
+    expect_finding: false
+    description: "Juneau ZIP+4, area 998 out of range"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "00501-0001"
+    expect_finding: false
+    description: "IRS Holtsville ZIP+4, area 005 in SSA range (confusable)"
+
+  - rule_id: us-ssn-structural
+    class: structural.ssn
+    input: "35801-1234"
+    expect_finding: false
+    description: "Huntsville ZIP+4, area 358 in SSA range (confusable)"
+
